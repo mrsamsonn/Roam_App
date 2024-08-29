@@ -5,5 +5,5 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-readme.txt
+# readme.txt
 .DS_Store
