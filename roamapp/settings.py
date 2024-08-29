@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_browser_reload',
     'rest_framework',
     'apps.mainApp',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "roamapp.urls"
@@ -133,3 +135,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]

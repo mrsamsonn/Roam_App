@@ -32,3 +32,4 @@ typing_extensions==4.12.2
 urllib3==2.2.2
 whitenoise
 djangorestframework
+django-cors-headers
