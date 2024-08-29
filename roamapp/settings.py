@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'theme',
     'django_browser_reload',
     'rest_framework',
+    'apps.mainApp',
 ]
 
 MIDDLEWARE = [
