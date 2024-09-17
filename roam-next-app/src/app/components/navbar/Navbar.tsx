@@ -7,7 +7,7 @@ import Signup from "./Signup";
 const Navbar = () => {
     return (
         <nav className="w-full fixed top-0 left-0 border-b py-2 bg-white z-10">
-            <div className="max-w-[1500px] mx-auto px-6">
+            <div className="max-w-[1500px] mx-auto px-10">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
                         <div className="flex items-center mr-6">
@@ -26,7 +26,7 @@ const Navbar = () => {
                         </div>
                     </div>
                     <div className="flex items-center">
-                        <div className="flex items-center mr-6">
+                        <div className="flex items-center mr-2">
                             <Login/>
                         </div>
                         <div className="flex items-center">
