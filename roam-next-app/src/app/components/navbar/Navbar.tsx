@@ -6,7 +6,7 @@ import Signup from "./Signup";
 
 const Navbar = () => {
     return (
-        <nav className="w-full fixed top-0 left-0 border-b py-2 bg-white z-10">
+        <nav className="w-full sticky z-50 top-0 left-0 border-b py-2 bg-white">
             <div className="max-w-[1500px] mx-auto px-10">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
