@@ -8,7 +8,7 @@ export default function Home() {
       <div className="flex h-full w-1/3">
         <Results/>
       </div>
-      <div className="flex w-2/3 h-full">
+      <div className="flex w-2/3 h-full z-0">
         <MapComponent/>
       </div>
     </main>

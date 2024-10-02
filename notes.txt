@@ -127,3 +127,8 @@ npm run build
 Run server
 django (backend) - python3 manage.py runserver
 nextjs (frontend) - npm run dev
+
+
+-----------
+Install maps
+npm install @types/leaflet
