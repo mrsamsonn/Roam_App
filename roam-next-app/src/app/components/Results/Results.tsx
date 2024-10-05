@@ -9,7 +9,13 @@ type Restaurant = {
   location: {
     address1: string;
   };
-  rating: number; // Add rating to the Restaurant type
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  rating: number;
+  distance: number; // Add distance to the Restaurant type
+  review_count: number; // Add review_count to the Restaurant type
 };
 
 interface ResultsProps {
@@ -26,6 +32,7 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         setCurrentLocation([latitude, longitude]);
+        console.log("Current Location:", latitude, longitude);
       }, (error) => {
         console.error("Geolocation error:", error);
       });
@@ -38,13 +45,15 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
     const fetchRestaurants = async () => {
       if (!currentLocation) return;
 
+      console.log("Fetching restaurants for location:", currentLocation);
+
       const apiKey = process.env.NEXT_PUBLIC_YELP_API_KEY;
       const config = {
         headers: {
           Authorization: `Bearer ${apiKey}`,
         },
         params: {
-          term: searchTerm || 'restaurants', // Use searchTerm here
+          term: searchTerm || 'restaurants',
           latitude: currentLocation[0],
           longitude: currentLocation[1],
         },
@@ -55,14 +64,22 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
           'https://api.yelp.com/v3/businesses/search',
           config
         );
-        setRestaurants(response.data.businesses);
+        const sortedRestaurants = response.data.businesses.sort((a: Restaurant, b: Restaurant) => {
+          // Sort by rating first, then by number of reviews
+          if (b.rating !== a.rating) {
+            return b.rating - a.rating; // Higher rating first
+          }
+          return b.review_count - a.review_count; // Higher review count first
+        });
+        setRestaurants(sortedRestaurants);
+        console.log("Restaurants fetched and sorted:", sortedRestaurants);
       } catch (error) {
         console.error('Error fetching restaurants:', error);
       }
     };
 
     fetchRestaurants();
-  }, [currentLocation, searchTerm]); // Add searchTerm as a dependency
+  }, [currentLocation, searchTerm]);
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
@@ -92,18 +109,28 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
         </h2>
         {restaurants.length ? (
           <ul className="space-y-4">
-            {restaurants.map((restaurant) => (
-              <li
-                className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
-                key={restaurant.id}
-              >
-                <h3 className="text-lg font-semibold">{restaurant.name}</h3>
-                <div className="text-gray-600 text-sm">{restaurant.location.address1}</div>
-                <div className="mt-2">
-                  <strong>Rating:</strong> {renderStars(restaurant.rating)} {restaurant.rating.toFixed(1)}
-                </div>
-              </li>
-            ))}
+            {restaurants.map((restaurant) => {
+              // Convert distance from meters to miles
+              const distanceInMiles = restaurant.distance * 0.000621371; 
+
+              console.log(`Distance to ${restaurant.name}:`, distanceInMiles.toFixed(2));
+
+              return (
+                <li
+                  className="p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+                  key={restaurant.id}
+                >
+                  <h3 className="text-lg font-semibold">{restaurant.name}</h3>
+                  <div className="text-gray-600 text-sm">{restaurant.location.address1}</div>
+                  <div className="mt-2">
+                    <strong>Distance:</strong> {distanceInMiles.toFixed(2)} miles
+                  </div>
+                  <div className="mt-2">
+                    <strong>Rating:</strong> {renderStars(restaurant.rating)} {restaurant.rating.toFixed(1)} ({restaurant.review_count} reviews)
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-gray-500">Loading...</p>
