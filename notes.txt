@@ -132,3 +132,7 @@ nextjs (frontend) - npm run dev
 -----------
 Install maps
 npm install @types/leaflet
+
+-----------
+Yelp API
+npm install axios
