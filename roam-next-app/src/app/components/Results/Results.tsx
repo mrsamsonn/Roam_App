@@ -12,7 +12,11 @@ type Restaurant = {
   rating: number; // Add rating to the Restaurant type
 };
 
-const Results = () => {
+interface ResultsProps {
+  searchTerm: string; // Define the type for searchTerm
+}
+
+const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 
@@ -40,7 +44,7 @@ const Results = () => {
           Authorization: `Bearer ${apiKey}`,
         },
         params: {
-          term: 'restaurants',
+          term: searchTerm || 'restaurants', // Use searchTerm here
           latitude: currentLocation[0],
           longitude: currentLocation[1],
         },
@@ -58,13 +62,12 @@ const Results = () => {
     };
 
     fetchRestaurants();
-  }, [currentLocation]);
+  }, [currentLocation, searchTerm]); // Add searchTerm as a dependency
 
-  // Function to render stars based on rating
   const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating); // Full stars
-    const hasHalfStar = rating % 1 >= 0.5; // Check for half star
-    const totalStars = 5; // Total stars to show
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const totalStars = 5;
 
     return (
       <div className="flex space-x-1">
@@ -83,8 +86,10 @@ const Results = () => {
 
   return (
     <div className="flex border w-full h-full p-4 bg-gray-50">
-      <div>
-        <h2 className="font-bold text-xl mb-4">Restaurants Near You:</h2>
+      <div className="w-full">
+        <h2 className="font-bold text-xl mb-4">
+          {searchTerm ? `Results for: ${searchTerm}` : "Restaurants Near You:"}
+        </h2>
         {restaurants.length ? (
           <ul className="space-y-4">
             {restaurants.map((restaurant) => (
