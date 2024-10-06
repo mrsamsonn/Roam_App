@@ -7,7 +7,8 @@ type Restaurant = {
   id: string;
   name: string;
   location: {
-    address1: string;
+    address1: string; // street address
+    city: string;     // city name
   };
   coordinates: {
     latitude: number;
@@ -102,7 +103,7 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
   };
 
   return (
-    <div className="flex border w-full h-full p-4 bg-gray-50">
+    <div className="flex border w-full h-full p-4 bg-gray-50 overflow-y-scroll">
       <div className="w-full">
         <h2 className="font-bold text-xl mb-4">
           {searchTerm ? `Results for: ${searchTerm}` : "Restaurants Near You:"}
@@ -121,7 +122,9 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
                   key={restaurant.id}
                 >
                   <h3 className="text-lg font-semibold">{restaurant.name}</h3>
-                  <div className="text-gray-600 text-sm">{restaurant.location.address1}</div>
+                  <div className="text-gray-600 text-sm">
+                    {restaurant.location.address1}, {restaurant.location.city}
+                  </div>
                   <div className="mt-2">
                     <strong>Distance:</strong> {distanceInMiles.toFixed(2)} miles
                   </div>

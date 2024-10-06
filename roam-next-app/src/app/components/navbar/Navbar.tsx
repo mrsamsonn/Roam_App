@@ -11,7 +11,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ setSearchTerm }) => {
   return (
-    <nav className="w-full sticky z-50 top-0 left-0 border-b py-2 bg-white">
+    <nav className="w-full sticky z-50 top-0 left-0 border-b py-2 bg-white shadow-md"> {/* Fixed the navbar */}
       <div className="max-w-[1500px] mx-auto px-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
