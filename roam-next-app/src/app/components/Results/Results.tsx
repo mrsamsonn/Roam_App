@@ -7,33 +7,32 @@ type Restaurant = {
   id: string;
   name: string;
   location: {
-    address1: string; // street address
-    city: string;     // city name
+    address1: string;
+    city: string;
   };
   coordinates: {
     latitude: number;
     longitude: number;
   };
   rating: number;
-  distance: number; // Add distance to the Restaurant type
-  review_count: number; // Add review_count to the Restaurant type
+  distance: number;
+  review_count: number;
 };
 
 interface ResultsProps {
-  searchTerm: string; // Define the type for searchTerm
+  searchTerm: string;
+  setRestaurants: React.Dispatch<React.SetStateAction<Restaurant[]>>;
 }
 
-const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+const Results: React.FC<ResultsProps> = ({ searchTerm, setRestaurants }) => {
+  const [restaurants, setLocalRestaurants] = useState<Restaurant[]>([]);
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 
   useEffect(() => {
-    // Get the user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         setCurrentLocation([latitude, longitude]);
-        console.log("Current Location:", latitude, longitude);
       }, (error) => {
         console.error("Geolocation error:", error);
       });
@@ -45,8 +44,6 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       if (!currentLocation) return;
-
-      console.log("Fetching restaurants for location:", currentLocation);
 
       const apiKey = process.env.NEXT_PUBLIC_YELP_API_KEY;
       const config = {
@@ -61,19 +58,40 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
       };
 
       try {
-        const response = await axios.get(
-          'https://api.yelp.com/v3/businesses/search',
-          config
-        );
-        const sortedRestaurants = response.data.businesses.sort((a: Restaurant, b: Restaurant) => {
-          // Sort by rating first, then by number of reviews
-          if (b.rating !== a.rating) {
-            return b.rating - a.rating; // Higher rating first
+        const response = await axios.get('https://api.yelp.com/v3/businesses/search', config);
+
+        // Calculate a relevance score based on how closely the restaurant name matches the search term
+        const calculateRelevance = (restaurantName: string, searchTerm: string): number => {
+          const lowerCaseName = restaurantName.toLowerCase();
+          const lowerCaseSearch = searchTerm.toLowerCase();
+
+          if (lowerCaseName.includes(lowerCaseSearch)) {
+            // Higher relevance score if the name contains the search term
+            return 2;
+          } else if (lowerCaseName.split(' ').some(word => word.startsWith(lowerCaseSearch))) {
+            // Medium relevance score if some word starts with the search term
+            return 1;
+          } else {
+            return 0;
           }
-          return b.review_count - a.review_count; // Higher review count first
+        };
+
+        const sortedRestaurants = response.data.businesses.sort((a: Restaurant, b: Restaurant) => {
+          const relevanceA = calculateRelevance(a.name, searchTerm);
+          const relevanceB = calculateRelevance(b.name, searchTerm);
+
+          // Primary sort by relevance, then rating, then review count
+          if (relevanceB !== relevanceA) {
+            return relevanceB - relevanceA;
+          }
+          if (b.rating !== a.rating) {
+            return b.rating - a.rating;
+          }
+          return b.review_count - a.review_count;
         });
+
+        setLocalRestaurants(sortedRestaurants);
         setRestaurants(sortedRestaurants);
-        console.log("Restaurants fetched and sorted:", sortedRestaurants);
       } catch (error) {
         console.error('Error fetching restaurants:', error);
       }
@@ -111,10 +129,7 @@ const Results: React.FC<ResultsProps> = ({ searchTerm }) => {
         {restaurants.length ? (
           <ul className="space-y-4">
             {restaurants.map((restaurant) => {
-              // Convert distance from meters to miles
-              const distanceInMiles = restaurant.distance * 0.000621371; 
-
-              console.log(`Distance to ${restaurant.name}:`, distanceInMiles.toFixed(2));
+              const distanceInMiles = restaurant.distance * 0.000621371;
 
               return (
                 <li
